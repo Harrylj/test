@@ -1,0 +1,113 @@
+<!DOCTYPE html>  
+<html lang="en">  
+<head>  
+    <meta charset="UTF-8">  
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">  
+    <title>贪吃蛇</title>  
+    <link rel="stylesheet" href="styles.css">  
+</head>  
+<body>  
+    <canvas id="gameCanvas" width="400" height="400"></canvas>  
+    <script>
+const canvas = document.getElementById('gameCanvas');  
+const ctx = canvas.getContext('2d');  
+  
+const boxSize = 20;  
+let snake = [{ x: 10, y: 10 }];  
+let food = { x: 15, y: 15 };  
+let dx = 1, dy = 0;  
+  
+function drawGame() {  
+    ctx.clearRect(0, 0, canvas.width, canvas.height);  
+  
+    // 画蛇  
+    ctx.fillStyle = 'green';  
+    snake.forEach((part, index) => {  
+        if (index === 0) {  
+            ctx.fillStyle = 'red';  
+        }  
+        ctx.fillRect(part.x * boxSize, part.y * boxSize, boxSize, boxSize);  
+    });  
+  
+    // 画食物  
+    ctx.fillStyle = 'yellow';  
+    ctx.fillRect(food.x * boxSize, food.y * boxSize, boxSize, boxSize);  
+  
+    // 更新蛇的位置  
+    const head = { ...snake[0] };  
+    head.x += dx;  
+    head.y += dy;  
+  
+    // 碰到边界或自己则游戏结束  
+    if (head.x < 0 || head.x >= canvas.width / boxSize || head.y < 0 || head.y >= canvas.height / boxSize || snake.slice(1).some(part => part.x === head.x && part.y === head.y)) {  
+        snake = [{ x: 10, y: 10 }];  
+        food = { x: 15, y: 15 };  
+        dx = 1;  
+        dy = 0;  
+    } else {  
+        snake.unshift(head);  
+  
+        // 如果吃到食物  
+        if (head.x === food.x && head.y === food.y) {  
+            food = { x: Math.floor(Math.random() * canvas.width / boxSize), y: Math.floor(Math.random() * canvas.height / boxSize) };  
+        } else {  
+            snake.pop();  
+        }  
+    }  
+}  
+  
+// 键盘控制  
+document.addEventListener('keydown', function(event) {  
+    switch(event.key) {  
+        case 'ArrowUp':  
+            if (dy === 0) { dx = 0; dy = -1; }  
+            break;  
+        case 'ArrowDown':  
+            if (dy === 0) { dx = 0; dy = 1; }  
+            break;  
+        case 'ArrowLeft':  
+            if (dx === 0) { dx = -1; dy = 0; }  
+            break;  
+        case 'ArrowRight':  
+            if (dx === 0) { dx = 1; dy = 0; }  
+            break;  
+    }  
+});  
+drawGame();
+
+const gameSpeed = 200; // 设置游戏速度，单位为毫秒  
+  
+let lastUpdateTime = Date.now();  
+  
+function gameLoop() {  
+    const currentTime = Date.now();  
+    const elapsedTime = currentTime - lastUpdateTime;  
+  
+    if (elapsedTime > gameSpeed) {  
+        lastUpdateTime = currentTime;  
+        drawGame();  
+    }  
+  
+    requestAnimationFrame(gameLoop);  
+}  
+  
+gameLoop();
+
+
+</script>  
+
+<style>
+body, html {  
+    margin: 0;  
+    padding: 0;  
+    overflow: hidden;  
+}  
+  
+#gameCanvas {  
+    background-color: #f4f4f4;  
+    display: block;  
+    margin: auto;  
+}
+</style>
+</body>  
+</html>
